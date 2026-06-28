@@ -1,0 +1,42 @@
+# General
+node_modules/
+.next/
+dist/
+build/
+.DS_Store
+
+# Python
+__pycache__/
+venv/
+.venv/
+Env/
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Media & Temporary Data
+temp_video_*/
+outputs/
+*.mp4
+*.wav
+*.mp3
+*.srt
+captions.srt
+speech.wav
+final_out.mp4
+intermediate.mp4
+
+# Project Specific
+cloudflared.exe
+*.log
+vosk-model/
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

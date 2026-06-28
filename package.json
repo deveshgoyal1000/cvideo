@@ -1,0 +1,11 @@
+{
+  "name": "the-spinity-root",
+  "private": true,
+  "workspaces": [
+    "Frontend",
+    "Beckend"
+  ],
+  "dependencies": {
+    "tailwindcss": "^4.2.3"
+  }
+}

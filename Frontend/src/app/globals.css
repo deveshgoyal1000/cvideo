@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+/* 1. Theme constants */
+@theme inline {
+  --color-primary: #0066CC;
+  --color-secondary: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --font-sans: var(--font-inter);
+}
+
+/* 2. Custom Variant for Tailwind v4 class-based dark mode */
+@custom-variant dark (&:is(.dark *));
+
+/* 3. Base Light Mode Variables */
+:root {
+  --color-background: #FAFAFA;
+  --color-surface: #FFFFFF;
+  --color-foreground: #111827;
+  --color-foreground-secondary: #4B5563;
+  --color-border-subtle: #D1D5DB;
+  /* Darkened from #E5E7EB to make borders more visible */
+}
+
+/* 4. Dark Mode Variable Overrides applied by next-themes */
+.dark {
+  --color-background: #0a0a0a;
+  --color-surface: #171717;
+  --color-foreground: #ededed;
+  --color-foreground-secondary: #a1a1aa;
+  --color-border-subtle: #27272a;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

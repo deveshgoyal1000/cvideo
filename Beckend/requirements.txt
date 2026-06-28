@@ -1,0 +1,11 @@
+coqui-tts
+fastapi
+uvicorn
+python-multipart
+torch
+torchaudio
+numpy
+scipy
+faster-whisper
+ffmpeg-python
+pandas
