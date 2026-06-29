@@ -1,0 +1,98 @@
+{
+  "id": "74ce9c8f-1aa2-4c8e-a312-ea14cd879350",
+  "video_path": "test_pexels.mp4",
+  "state": "READY",
+  "language": "en",
+  "template_id": "modern",
+  "captions": [
+    {
+      "id": "c7fd14c8-c6a6-48cc-b2f7-cc00ad6a084d",
+      "start": 13.74,
+      "end": 15.14,
+      "speaker": "speaker_0",
+      "layout_type": "bottom",
+      "words": [
+        {
+          "id": "e4f7999d-4a60-4cb9-86d2-a8cf3b1c9425",
+          "text": "You",
+          "normalized": "you",
+          "start": 13.74,
+          "end": 15.14,
+          "confidence": 0.06717678159475327,
+          "highlight": false,
+          "emoji": null,
+          "style": {
+            "font_family": "Arial",
+            "font_weight": 800,
+            "color": "&H00FFFFFF",
+            "font_size": 48,
+            "custom_props": {}
+          },
+          "animations": [],
+          "effects": [
+            {
+              "type": "shadow",
+              "params": {
+                "color": "&H80000000",
+                "depth": 2
+              }
+            }
+          ],
+          "bounding_box": {
+            "x": 495.6,
+            "y": 1762.4,
+            "width": 79.2,
+            "height": 57.599999999999994
+          }
+        }
+      ],
+      "bounding_box": {
+        "x": 495.6,
+        "y": 1762.4,
+        "width": 88.80000000000001,
+        "height": 57.599999999999994
+      }
+    }
+  ],
+  "render_context": {
+    "fps": 30.0,
+    "resolution_x": 1080,
+    "resolution_y": 1920,
+    "aspect_ratio": "9:16",
+    "safe_zone_margin": 100,
+    "preview_mode": false,
+    "quality": "high"
+  },
+  "metrics": {
+    "TranscriberEngine": 6.552482604980469,
+    "TimingEngine": 0.0,
+    "NLPEngine": 0.0008749961853027344,
+    "ChunkerEngine": 0.0,
+    "GeometryEngine": 0.0,
+    "LayoutEngine": 0.0,
+    "compiled_template": {
+      "font_family": "Arial",
+      "font_size": 48,
+      "font_weight": 800,
+      "color": "&H00FFFFFF",
+      "highlight_color": "&H0000FFFF",
+      "effects": [
+        {
+          "type": "shadow",
+          "params": {
+            "color": "&H80000000",
+            "depth": 2
+          }
+        }
+      ],
+      "animation": "pop"
+    },
+    "TemplateCompiler": 0.0003705024719238281,
+    "StyleResolver": 0.0,
+    "EffectsEngine": 0.0003216266632080078,
+    "AnimationEngine": 0.0,
+    "validation_warnings": [],
+    "validation_errors": [],
+    "RuleEngine": 0.0
+  }
+}

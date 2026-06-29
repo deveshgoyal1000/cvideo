@@ -1,0 +1,17 @@
+from enum import Enum
+
+class ProjectState(str, Enum):
+    NEW = "NEW"
+    TRANSCRIBED = "TRANSCRIBED"
+    TIMED = "TIMED"
+    CHUNKED = "CHUNKED"
+    GEOMETRY = "GEOMETRY"
+    LAYOUT = "LAYOUT"
+    TEMPLATE_COMPILED = "TEMPLATE_COMPILED"
+    STYLED = "STYLED"
+    EFFECTS = "EFFECTS"
+    ANIMATED = "ANIMATED"
+    READY = "READY"
+    RENDERING = "RENDERING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"

@@ -9,9 +9,12 @@ import audioop
 import time
 import math
 import struct
-from fastapi import FastAPI, HTTPException, UploadFile, File, WebSocket, Request, Response
+from fastapi import FastAPI, HTTPException, UploadFile, File, WebSocket, Request, Response, BackgroundTasks, Depends
 from fastapi.responses import FileResponse
 import uuid
+import shutil
+from sqlalchemy.orm import Session
+from database import init_db, get_db, TranscriptionJob, RenderJob
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
@@ -46,8 +49,9 @@ app.add_middleware(
 )
 
 @app.on_event("startup")
-async def load_model():
-    print("Startup complete. Twilio endpoints ready.")
+async def startup_event():
+    init_db()
+    print("Startup complete. Twilio endpoints and Database ready.")
 
 @app.post("/tts")
 async def text_to_speech(text: str, language: str = "en", speaker_wav: UploadFile = File(None)):
@@ -740,6 +744,214 @@ async def render_captions_api(req: RenderRequest):
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+
+# ---------------------------------------------------------------------------
+# V2 ASYNC CAPTION ENDPOINTS
+# ---------------------------------------------------------------------------
+
+def background_transcribe(job_id: str, video_path: str, db: Session):
+    try:
+        from caption_utils import transcribe_video, enhance_transcript_with_ai
+        words_data = transcribe_video(video_path)
+        words_data = enhance_transcript_with_ai(words_data)
+        
+        job = db.query(TranscriptionJob).filter(TranscriptionJob.id == job_id).first()
+        if job:
+            job.status = "completed"
+            job.words_data = words_data
+            db.commit()
+    except Exception as e:
+        job = db.query(TranscriptionJob).filter(TranscriptionJob.id == job_id).first()
+        if job:
+            job.status = "failed"
+            job.error_message = str(e)
+            db.commit()
+
+@app.post("/api/captions/v2/transcribe")
+async def transcribe_captions_v2(background_tasks: BackgroundTasks, file: UploadFile = File(...), db: Session = Depends(get_db)):
+    os.makedirs("temp", exist_ok=True)
+    temp_vid = f"temp/{uuid.uuid4()}_{file.filename}"
+    with open(temp_vid, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+        
+    job_id = str(uuid.uuid4())
+    job = TranscriptionJob(id=job_id, status="processing")
+    db.add(job)
+    db.commit()
+    
+    # Needs a separate DB session for background task, or we can just pass the path. 
+    # Passing the exact session across threads is dangerous in SQLAlchemy if check_same_thread=True, but we disabled it.
+    # For safety, we will let background task manage its own, or just pass `db` since we disabled thread check.
+    background_tasks.add_task(background_transcribe, job_id, temp_vid, db)
+    return {"status": "success", "job_id": job_id, "video_path": temp_vid}
+
+@app.get("/api/captions/v2/status/{job_id}")
+async def get_transcribe_status(job_id: str, db: Session = Depends(get_db)):
+    job = db.query(TranscriptionJob).filter(TranscriptionJob.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return {"job_id": job.id, "status": job.status, "words": job.words_data, "error": job.error_message}
+
+class RenderRequestV2(BaseModel):
+    words_data: list
+    style: str
+    video_path: str
+
+def background_render(job_id: str, video_path: str, words_data: list, style: str, db: Session):
+    try:
+        from caption_utils import render_captions
+        out_vid = f"temp/rendered_{job_id}.mp4"
+        render_captions(video_path, words_data, style, out_vid)
+        
+        job = db.query(RenderJob).filter(RenderJob.id == job_id).first()
+        if job:
+            job.status = "completed"
+            job.output_video_path = out_vid
+            db.commit()
+    except Exception as e:
+        job = db.query(RenderJob).filter(RenderJob.id == job_id).first()
+        if job:
+            job.status = "failed"
+            job.error_message = str(e)
+            db.commit()
+
+@app.post("/api/captions/v2/render")
+async def render_captions_v2(req: RenderRequestV2, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    job_id = str(uuid.uuid4())
+    job = RenderJob(id=job_id, status="processing", style=req.style)
+    db.add(job)
+    db.commit()
+    
+    background_tasks.add_task(background_render, job_id, req.video_path, req.words_data, req.style, db)
+    return {"status": "success", "job_id": job_id}
+
+# ---------------------------------------------------------------------------
+# V3 Enterprise Pipeline Endpoints
+# ---------------------------------------------------------------------------
+def background_transcribe_v3(job_id: str, video_path: str, db: Session):
+    try:
+        from core.orchestrator import PipelineManager
+        from captions.transcriber import TranscriberEngine
+        from captions.timing_engine import TimingEngine
+        from captions.nlp_engine import NLPEngine
+        from captions.chunker_engine import ChunkerEngine
+        from captions.geometry_engine import GeometryEngine
+        from captions.layout_engine import LayoutEngine
+        from captions.template_compiler import TemplateCompiler
+        from captions.style_resolver import StyleResolver
+        from captions.effects_engine import EffectsEngine
+        from captions.animation_engine import AnimationEngine
+        from rules.rule_engine import RuleEngine
+        from models.core import Project
+        from uuid import UUID
+
+        pipeline = PipelineManager([
+            TranscriberEngine(), TimingEngine(), NLPEngine(), ChunkerEngine(),
+            GeometryEngine(), LayoutEngine(), TemplateCompiler(), StyleResolver(),
+            EffectsEngine(), AnimationEngine(), RuleEngine()
+        ])
+        project = Project(id=UUID(job_id), video_path=video_path, language="en")
+        project = pipeline.run(project)
+        
+        job = db.query(TranscriptionJob).filter(TranscriptionJob.id == job_id).first()
+        if job:
+            job.status = "completed"
+            job.words_data = [project.model_dump(mode='json')]
+            db.commit()
+    except Exception as e:
+        job = db.query(TranscriptionJob).filter(TranscriptionJob.id == job_id).first()
+        if job:
+            job.status = "failed"
+            job.error_message = str(e)
+            db.commit()
+
+@app.post("/api/captions/v3/transcribe")
+async def transcribe_captions_v3(background_tasks: BackgroundTasks, file: UploadFile = File(...), db: Session = Depends(get_db)):
+    os.makedirs("temp", exist_ok=True)
+    temp_vid = f"temp/{uuid.uuid4()}_{file.filename}"
+    with open(temp_vid, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+        
+    job_id = str(uuid.uuid4())
+    job = TranscriptionJob(id=job_id, status="processing")
+    db.add(job)
+    db.commit()
+    
+    background_tasks.add_task(background_transcribe_v3, job_id, temp_vid, db)
+    return {"status": "success", "job_id": job_id, "video_path": temp_vid}
+
+@app.get("/api/captions/v3/status/{job_id}")
+async def get_transcribe_status_v3(job_id: str, db: Session = Depends(get_db)):
+    job = db.query(TranscriptionJob).filter(TranscriptionJob.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return {"job_id": job.id, "status": job.status, "project_data": job.words_data, "error": job.error_message}
+
+class RenderRequestV3(BaseModel):
+    project_data: dict
+
+def background_render_v3(job_id: str, project_dict: dict, db: Session):
+    try:
+        import subprocess
+        from models.core import Project
+        from render.ass_renderer import ASSRenderer
+        import imageio_ffmpeg
+        
+        project = Project.model_validate(project_dict)
+        ass_path = f"temp/rendered_{job_id}.ass"
+        out_vid = f"temp/rendered_{job_id}.mp4"
+        
+        ASSRenderer().generate_ass(project, ass_path)
+        
+        ffmpeg_path = imageio_ffmpeg.get_ffmpeg_exe()
+        
+        ass_path_escaped = ass_path.replace('\\', '/')
+        if len(ass_path_escaped) > 1 and ass_path_escaped[1] == ':':
+            ass_path_escaped = ass_path_escaped[0] + '\\:' + ass_path_escaped[2:]
+
+        command = [
+            ffmpeg_path, "-y", "-i", project.video_path,
+            "-vf", f"ass='{ass_path_escaped}'",
+            "-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
+            "-c:a", "copy", out_vid
+        ]
+        subprocess.run(command, check=True)
+        
+        job = db.query(RenderJob).filter(RenderJob.id == job_id).first()
+        if job:
+            job.status = "completed"
+            job.output_video_path = out_vid
+            db.commit()
+    except Exception as e:
+        job = db.query(RenderJob).filter(RenderJob.id == job_id).first()
+        if job:
+            job.status = "failed"
+            job.error_message = str(e)
+            db.commit()
+
+@app.post("/api/captions/v3/render")
+async def render_captions_v3(req: RenderRequestV3, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    job_id = str(uuid.uuid4())
+    job = RenderJob(id=job_id, status="processing", style=req.project_data.get("template_id", "modern"))
+    db.add(job)
+    db.commit()
+    
+    background_tasks.add_task(background_render_v3, job_id, req.project_data, db)
+    return {"status": "success", "job_id": job_id}
+
+@app.get("/api/captions/v3/render_status/{job_id}")
+async def get_render_status_v3(job_id: str, db: Session = Depends(get_db)):
+    job = db.query(RenderJob).filter(RenderJob.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return {"job_id": job.id, "status": job.status, "error": job.error_message}
+
+@app.get("/api/captions/v3/download/{job_id}")
+async def download_rendered_video_v3(job_id: str, db: Session = Depends(get_db)):
+    job = db.query(RenderJob).filter(RenderJob.id == job_id).first()
+    if not job or not job.output_video_path or not os.path.exists(job.output_video_path):
+        raise HTTPException(status_code=404, detail="Video not found or not finished")
+    return FileResponse(job.output_video_path, media_type="video/mp4", filename=f"rendered_{job_id}.mp4")
 
 if __name__ == "__main__":
     import uvicorn

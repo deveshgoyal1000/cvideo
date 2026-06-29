@@ -1,0 +1,26 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 1
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: DynamicStyle,Arial,48,&H00FFFFFF,&H000000FF,&H00000000,&H80000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.00,0:00:02.26,DynamicStyle,,0,0,0,,{\k20}{\c&H00FFFFFF}I {\k27}{\c&H00FFFFFF}believe {\k20}{\c&H00FFFFFF}that {\k13}{\c&H00FFFFFF}a {\k31}{\c&H00FFFFFF}rising {\k28}{\c&H00FFFFFF}tide {\k30}{\c&H00FFFFFF}lifts {\k28}{\c&H00FFFFFF}all {\k25}{\c&H00FFFFFF}ships.
+Dialogue: 0,0:00:02.80,0:00:02.90,DynamicStyle,,0,0,0,,{\k10}{\c&H00FFFFFF}Sure,
+Dialogue: 0,0:00:03.06,0:00:05.06,DynamicStyle,,0,0,0,,{\k18}{\c&H00FFFFFF}like {\k5}{\c&H00FFFFFF}when {\k18}{\c&H00FFFFFF}you {\k52}{\c&H00FFFFFF}make {\k28}{\c&H00FFFFFF}hay {\k21}{\c&H00FFFFFF}while {\k9}{\c&H00FFFFFF}the {\k14}{\c&H00FFFFFF}sun {\k31}{\c&H00FFFFFF}shines.
+Dialogue: 0,0:00:07.26,0:00:08.88,DynamicStyle,,0,0,0,,{\k48}{\c&H00FFFFFF}I {\k25}{\c&H00FFFFFF}think {\k43}{\c&H00FFFFFF}by {\k33}{\c&H00FFFFFF}the {\k9}{\c&H00FFFFFF}big,
+Dialogue: 0,0:00:09.32,0:00:11.96,DynamicStyle,,0,0,0,,{\k24}{\c&H00FFFFFF}the {\k43}{\c&H00FFFFFF}most {\k30}{\c&H00FFFFFF}important {\k1}{\c&H00FFFFFF}thing {\k1}{\c&H00FFFFFF}is {\k1}{\c&H00FFFFFF}that {\k75}{\c&H00FFFFFF}you {\k66}{\c&H00FFFFFF}feel {\k20}{\c&H00FFFFFF}good.
+Dialogue: 0,0:00:12.34,0:00:12.98,DynamicStyle,,0,0,0,,{\k48}{\c&H00FFFFFF}Of {\k16}{\c&H00FFFFFF}course,
+Dialogue: 0,0:00:13.12,0:00:14.30,DynamicStyle,,0,0,0,,{\k14}{\c&H00FFFFFF}because {\k20}{\c&H00FFFFFF}then {\k9}{\c&H00FFFFFF}when {\k24}{\c&H00FFFFFF}someone {\k17}{\c&H00FFFFFF}will {\k9}{\c&H00FFFFFF}judge {\k22}{\c&H00FFFFFF}you,
+Dialogue: 0,0:00:14.30,0:00:14.84,DynamicStyle,,0,0,0,,{\k9}{\c&H00FFFFFF}you {\k9}{\c&H00FFFFFF}will {\k16}{\c&H00FFFFFF}feel {\k17}{\c&H00FFFFFF}bad.
+Dialogue: 0,0:00:15.38,0:00:18.06,DynamicStyle,,0,0,0,,{\k47}{\c&H00FFFFFF}So {\k30}{\c&H00FFFFFF}it's {\k17}{\c&H00FFFFFF}a {\k92}{\c&H00FFFFFF}net {\k17}{\c&H00FFFFFF}net {\k21}{\c&H00FFFFFF}zero {\k19}{\c&H00FFFFFF}sum {\k19}{\c&H00FFFFFF}game.
+Dialogue: 0,0:00:18.24,0:00:19.68,DynamicStyle,,0,0,0,,{\k36}{\c&H00FFFFFF}The {\k19}{\c&H00FFFFFF}more {\k14}{\c&H00FFFFFF}you {\k32}{\c&H00FFFFFF}suppress {\k41}{\c&H00FFFFFF}something,
+Dialogue: 0,0:00:20.04,0:00:20.94,DynamicStyle,,0,0,0,,{\k40}{\c&H00FFFFFF}you {\k1}{\c&H00FFFFFF}control {\k1}{\c&H00FFFFFF}the {\k50}{\c&H00FFFFFF}relationship,
+Dialogue: 0,0:00:22.68,0:00:23.72,DynamicStyle,,0,0,0,,{\k8}{\c&H00FFFFFF}the {\k21}{\c&H00FFFFFF}more {\k21}{\c&H00FFFFFF}you {\k42}{\c&H00FFFFFF}catch {\k10}{\c&H00FFFFFF}it,
+Dialogue: 0,0:00:24.26,0:00:25.58,DynamicStyle,,0,0,0,,{\k39}{\c&H00FFFFFF}you {\k51}{\c&H00FFFFFF}can't {\k24}{\c&H00FFFFFF}grab {\k15}{\c&H00FFFFFF}it.
+Dialogue: 0,0:00:25.58,0:00:26.44,DynamicStyle,,0,0,0,,{\k8}{\c&H00FFFFFF}It's {\k7}{\c&H00FFFFFF}like {\k30}{\c&H00FFFFFF}grabbing {\k40}{\c&H00FFFFFF}sand.

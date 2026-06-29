@@ -62,6 +62,95 @@ uvicorn main:app --reload
 npm run dev
 ```
 
+## 🎙️ AI Captions Studio – Product Description
+
+**AI Captions Studio** is an intelligent video captioning platform that automatically generates stylish, animated subtitles for short-form videos like Instagram Reels, YouTube Shorts, and TikTok.
+
+Creators simply upload a video, and the AI transcribes speech with high accuracy, synchronizes captions word-by-word, and applies engaging animations that keep viewers watching. With multiple caption styles, customizable fonts, colors, emojis, and templates, users can create professional-looking videos in minutes—without any video editing experience.
+
+### Key Features
+
+* **AI Speech-to-Text**
+  * Fast and accurate transcription for multiple languages and accents.
+  * Automatic punctuation and capitalization.
+
+* **Word-by-Word Animated Captions**
+  * Karaoke-style highlighting.
+  * Smooth pop, bounce, fade, zoom, and slide animations.
+  * Perfect timing synced with speech.
+
+* **Custom Caption Styles**
+  * Modern creator-inspired templates.
+  * Custom fonts, colors, outlines, shadows, and backgrounds.
+  * Brand presets for consistent content.
+
+* **Emoji & Keyword Highlighting**
+  * Automatically add relevant emojis.
+  * Highlight important words with different colors or animations.
+
+* **Multiple Aspect Ratios**
+  * 9:16 (Reels, Shorts, TikTok)
+  * 16:9 (YouTube)
+  * 1:1 (Instagram Feed)
+
+* **Easy Editing**
+  * Edit transcript text.
+  * Adjust caption timing.
+  * Split or merge caption segments.
+  * Drag-and-drop timeline editor.
+
+* **High-Quality Export**
+  * Export videos in up to 4K resolution.
+  * Burned-in captions for universal compatibility.
+  * Optimized for social media platforms.
+
+* **Multi-Language Support**
+  * Automatic language detection.
+  * Translation into multiple languages.
+  * Bilingual subtitle support.
+
+* **Cloud-Based Processing**
+  * No software installation required.
+  * Process videos directly in the browser.
+  * Secure cloud storage and project management.
+
+### Ideal Users
+* Content Creators
+* Influencers
+* Coaches & Educators
+* Podcasters
+* Marketing Agencies
+* Social Media Managers
+* Small Businesses
+* Video Editors
+
+### Benefits
+* Save hours of manual subtitle editing.
+* Increase viewer engagement with dynamic captions.
+* Improve accessibility for viewers watching without sound.
+* Create professional, viral-ready videos in minutes.
+* Maintain consistent branding across all content.
+
+### Workflow
+1. Upload your video.
+2. AI automatically transcribes the audio.
+3. Choose a caption style or template.
+4. Customize fonts, colors, and animations.
+5. Edit text if needed.
+6. Export and publish directly to social media.
+
+### Future Enhancements
+* AI-generated B-roll suggestions
+* Auto zoom and punch-in effects
+* Background noise removal
+* AI voice enhancement
+* Auto-generated hooks and titles
+* Brand kit synchronization
+* Team collaboration
+* Direct publishing to Instagram, TikTok, and YouTube
+* Trending caption templates
+* AI-powered content repurposing
+
 ## 📂 Project Structure
 
 ```text
