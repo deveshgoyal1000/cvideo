@@ -57,15 +57,26 @@ class RenderContext(BaseModel):
     quality: str = "high"
 
 class GlobalStyle(BaseModel):
-    font_family: str = "Arial"
-    font_size: int = 48
-    primary_color: str = "#FFFFFF"
-    outline_color: str = "#000000"
-    back_color: str = "#000000"
-    alignment: int = 2
-    margin_v: int = 150
-    margin_l: int = 10
-    margin_r: int = 10
+    font_family: str = Field(default="Arial")
+    font_size: int = Field(default=48)
+    primary_color: str = Field(default="#FFFFFF")
+    outline_color: str = Field(default="#000000")
+    back_color: str = Field(default="#000000")
+    bold: int = Field(default=1) # 1 or 0
+    italic: int = Field(default=0) # 1 or 0
+    underline: int = Field(default=0) # 1 or 0
+    strikeout: int = Field(default=0) # 1 or 0
+    scale_x: int = Field(default=100)
+    scale_y: int = Field(default=100)
+    spacing: int = Field(default=0)
+    angle: int = Field(default=0)
+    border_style: int = Field(default=1) # 1=Outline, 3=Opaque Box
+    outline: int = Field(default=3)
+    shadow: int = Field(default=2)
+    alignment: int = Field(default=2)  # 2=bottom-center, 5=middle-center, 8=top-center
+    margin_v: int = Field(default=150)
+    margin_l: int = Field(default=10)
+    margin_r: int = Field(default=10)
 
 class Project(BaseModel):
     id: UUID = Field(default_factory=uuid4)

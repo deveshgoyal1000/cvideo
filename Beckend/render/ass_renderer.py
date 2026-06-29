@@ -31,7 +31,7 @@ WrapStyle: 1
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: DynamicStyle,{style.font_family},{style.font_size},{primary},&H000000FF,{outline},{back},1,0,0,0,100,100,0,0,1,3,2,{style.alignment},{style.margin_l},{style.margin_r},{style.margin_v},1
+Style: DynamicStyle,{style.font_family},{style.font_size},{primary},&H000000FF,{outline},{back},{style.bold},{style.italic},{style.underline},{style.strikeout},{style.scale_x},{style.scale_y},{style.spacing},{style.angle},{style.border_style},{style.outline},{style.shadow},{style.alignment},{style.margin_l},{style.margin_r},{style.margin_v},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
