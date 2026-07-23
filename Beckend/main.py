@@ -57,6 +57,10 @@ async def startup_event():
     os.makedirs("temp", exist_ok=True)
     print("Startup complete. Twilio endpoints and Database ready.")
 
+@app.get("/")
+async def root():
+    return {"status": "success", "message": "The API is running perfectly!"}
+
 @app.post("/tts")
 async def text_to_speech(text: str, language: str = "en", speaker_wav: UploadFile = File(None)):
     raise HTTPException(status_code=500, detail="Local XTTS is temporarily disabled.")
