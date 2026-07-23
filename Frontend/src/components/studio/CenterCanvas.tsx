@@ -23,7 +23,7 @@ export default function CenterCanvas() {
     useEffect(() => {
         if (!videoRef.current) return;
         // Only update video if the difference is substantial to avoid loop
-        if (Math.abs(videoRef.current.currentTime - currentTime) > 0.5) {
+        if (Math.abs(videoRef.current.currentTime - currentTime) > 0.1) {
             videoRef.current.currentTime = currentTime;
         }
     }, [currentTime]);
@@ -167,7 +167,7 @@ export default function CenterCanvas() {
             textShadow: textShadow,
             letterSpacing: toPx(gs.spacing || 0),
             lineHeight: 1.2,
-            width: `${renderedWidth * 0.9}px`, // Max width is 90% of the actual video width!
+            width: `calc(${renderedWidth}px - ${(gs.margin_l || 0) * (renderedWidth / 1080)}px - ${(gs.margin_r || 0) * (renderedWidth / 1080)}px)`,
             pointerEvents: "none",
         };
     };
