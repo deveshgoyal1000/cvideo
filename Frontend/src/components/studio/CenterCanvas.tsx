@@ -32,7 +32,7 @@ export default function CenterCanvas() {
         setLoading(true, "Processing AI Pipeline...");
         const interval = setInterval(async () => {
             try {
-                const res = await fetch(`http://localhost:8000/api/captions/v3/status/${jobId}`);
+                const res = await fetch(`https://cvideo-nlxn.onrender.com/api/captions/v3/status/${jobId}`);
                 const data = await res.json();
                 
                 if (data.status === "completed") {
@@ -64,7 +64,7 @@ export default function CenterCanvas() {
         setProjectData(null);
         
         try {
-            const res = await fetch("http://localhost:8000/api/captions/v3/transcribe", {
+            const res = await fetch("https://cvideo-nlxn.onrender.com/api/captions/v3/transcribe", {
                 method: "POST",
                 body: formData,
             });

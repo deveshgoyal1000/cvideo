@@ -23,7 +23,7 @@ export default function ShortsGenerator() {
     setLoadingNews(true);
     try {
       // Append a timestamp to perfectly bust the browser cache!
-      const res = await fetch(`http://localhost:8000/api/fetch-news?t=${new Date().getTime()}`);
+      const res = await fetch(`https://cvideo-nlxn.onrender.com/api/fetch-news?t=${new Date().getTime()}`);
       const data = await res.json();
       if (data.status === "success") {
         setNews(data.data);
@@ -46,7 +46,7 @@ export default function ShortsGenerator() {
     setGeneratingScript(true);
     setScriptError("");
     try {
-      const res = await fetch("http://localhost:8000/api/generate-script", {
+      const res = await fetch("https://cvideo-nlxn.onrender.com/api/generate-script", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ news_text: topic.title + " " + topic.summary }),
@@ -76,7 +76,7 @@ export default function ShortsGenerator() {
 
     try {
       // 1. Script
-      const scriptRes = await fetch("http://localhost:8000/api/generate-script", {
+      const scriptRes = await fetch("https://cvideo-nlxn.onrender.com/api/generate-script", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ news_text: topic.title + " " + topic.summary }),
@@ -95,7 +95,7 @@ export default function ShortsGenerator() {
 
       // 2. Audio
       setGeneratingAudio(true);
-      const audioRes = await fetch("http://localhost:8000/api/generate-audio", {
+      const audioRes = await fetch("https://cvideo-nlxn.onrender.com/api/generate-audio", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ script_text: generatedScript, voice: "Fenrir" }),
@@ -115,7 +115,7 @@ export default function ShortsGenerator() {
 
       // 3. Video
       setGeneratingVideo(true);
-      const videoRes = await fetch("http://localhost:8000/api/generate-video", {
+      const videoRes = await fetch("https://cvideo-nlxn.onrender.com/api/generate-video", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ script_text: generatedScript, audio_base64: audioBase64 }),
@@ -143,7 +143,7 @@ export default function ShortsGenerator() {
     setGeneratingAudio(true);
     setAudioUrl(null);
     try {
-      const res = await fetch("http://localhost:8000/api/generate-audio", {
+      const res = await fetch("https://cvideo-nlxn.onrender.com/api/generate-audio", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ script_text: scriptText, voice: "Fenrir" }),
@@ -165,7 +165,7 @@ export default function ShortsGenerator() {
     setVideoUrl(null);
     try {
       const audioBase64 = audioUrl.split(',')[1];
-      const res = await fetch("http://localhost:8000/api/generate-video", {
+      const res = await fetch("https://cvideo-nlxn.onrender.com/api/generate-video", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ script_text: scriptText, audio_base64: audioBase64 }),

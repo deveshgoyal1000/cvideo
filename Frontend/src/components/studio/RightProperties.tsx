@@ -54,7 +54,7 @@ export default function RightProperties() {
         const renderPayload = JSON.parse(JSON.stringify(projectData));
 
         try {
-            const res = await fetch("http://localhost:8000/api/captions/v3/render", {
+            const res = await fetch("https://cvideo-nlxn.onrender.com/api/captions/v3/render", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ project_data: renderPayload })
@@ -77,12 +77,12 @@ export default function RightProperties() {
         setLoading(true, "Burning Captions into Video...");
         const interval = setInterval(async () => {
             try {
-                const res = await fetch(`http://localhost:8000/api/captions/v3/render_status/${jobId}`);
+                const res = await fetch(`https://cvideo-nlxn.onrender.com/api/captions/v3/render_status/${jobId}`);
                 const data = await res.json();
                 
                 if (data.status === "completed") {
                     clearInterval(interval);
-                    setFinalVideoUrl(`http://localhost:8000/api/captions/v3/download/${jobId}`);
+                    setFinalVideoUrl(`https://cvideo-nlxn.onrender.com/api/captions/v3/download/${jobId}`);
                     setRendering(false, "");
                     setLoading(false, "");
                 } else if (data.status === "failed") {

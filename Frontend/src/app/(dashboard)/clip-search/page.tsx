@@ -27,7 +27,7 @@ export default function ClipSearchPage() {
     setSearchedKeyword(trimmed);
 
     try {
-      const res = await fetch("http://localhost:8000/api/search-clips", {
+      const res = await fetch("https://cvideo-nlxn.onrender.com/api/search-clips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ keyword: trimmed, duration }),
@@ -71,7 +71,7 @@ export default function ClipSearchPage() {
       setClipCount(0);
       setSearchedKeyword(trimmed);
 
-      fetch("http://localhost:8000/api/search-clips", {
+      fetch("https://cvideo-nlxn.onrender.com/api/search-clips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ keyword: trimmed, duration }),
