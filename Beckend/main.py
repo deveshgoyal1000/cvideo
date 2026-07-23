@@ -14,7 +14,7 @@ from fastapi.responses import FileResponse
 import uuid
 import shutil
 from sqlalchemy.orm import Session
-from database import init_db, get_db, TranscriptionJob, RenderJob
+from database import init_db, get_db, SessionLocal, TranscriptionJob, RenderJob
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
@@ -51,6 +51,10 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event():
     init_db()
+    if os.path.exists("temp"):
+        try: shutil.rmtree("temp")
+        except: pass
+    os.makedirs("temp", exist_ok=True)
     print("Startup complete. Twilio endpoints and Database ready.")
 
 @app.post("/tts")
@@ -555,6 +559,8 @@ async def search_clips(req: ClipSearchRequest):
     os.makedirs(work_dir, exist_ok=True)
     
     try:
+        import ssl
+        ssl_ctx = ssl._create_unverified_context()
         # 2. Search Pexels
         encoded_kw = urllib.parse.quote(search_keyword)
         pexels_url = f"https://api.pexels.com/v1/videos/search?query={encoded_kw}&orientation=portrait&per_page=15&size=medium"
@@ -563,7 +569,7 @@ async def search_clips(req: ClipSearchRequest):
             'User-Agent': 'Mozilla/5.0'
         })
         
-        with urllib.request.urlopen(req_obj, timeout=30) as response:
+        with urllib.request.urlopen(req_obj, timeout=30, context=ssl_ctx) as response:
             data = json.loads(response.read().decode('utf-8'))
         
         videos = data.get("videos", [])
@@ -583,7 +589,7 @@ async def search_clips(req: ClipSearchRequest):
             out_vid = os.path.join(work_dir, f"raw_{i}.mp4")
             try:
                 req_vid = urllib.request.Request(download_link, headers={'User-Agent': 'Mozilla/5.0'})
-                with urllib.request.urlopen(req_vid, timeout=30) as down_res, open(out_vid, 'wb') as out_file:
+                with urllib.request.urlopen(req_vid, timeout=30, context=ssl_ctx) as down_res, open(out_vid, 'wb') as out_file:
                     shutil.copyfileobj(down_res, out_file)
                 if os.path.getsize(out_vid) > 5000:
                     return out_vid
@@ -749,7 +755,8 @@ async def render_captions_api(req: RenderRequest):
 # V2 ASYNC CAPTION ENDPOINTS
 # ---------------------------------------------------------------------------
 
-def background_transcribe(job_id: str, video_path: str, db: Session):
+def background_transcribe(job_id: str, video_path: str):
+    db = SessionLocal()
     try:
         from caption_utils import transcribe_video, enhance_transcript_with_ai
         words_data = transcribe_video(video_path)
@@ -766,6 +773,8 @@ def background_transcribe(job_id: str, video_path: str, db: Session):
             job.status = "failed"
             job.error_message = str(e)
             db.commit()
+    finally:
+        db.close()
 
 @app.post("/api/captions/v2/transcribe")
 async def transcribe_captions_v2(background_tasks: BackgroundTasks, file: UploadFile = File(...), db: Session = Depends(get_db)):
@@ -779,10 +788,7 @@ async def transcribe_captions_v2(background_tasks: BackgroundTasks, file: Upload
     db.add(job)
     db.commit()
     
-    # Needs a separate DB session for background task, or we can just pass the path. 
-    # Passing the exact session across threads is dangerous in SQLAlchemy if check_same_thread=True, but we disabled it.
-    # For safety, we will let background task manage its own, or just pass `db` since we disabled thread check.
-    background_tasks.add_task(background_transcribe, job_id, temp_vid, db)
+    background_tasks.add_task(background_transcribe, job_id, temp_vid)
     return {"status": "success", "job_id": job_id, "video_path": temp_vid}
 
 @app.get("/api/captions/v2/status/{job_id}")
@@ -797,7 +803,8 @@ class RenderRequestV2(BaseModel):
     style: str
     video_path: str
 
-def background_render(job_id: str, video_path: str, words_data: list, style: str, db: Session):
+def background_render(job_id: str, video_path: str, words_data: list, style: str):
+    db = SessionLocal()
     try:
         from caption_utils import render_captions
         out_vid = f"temp/rendered_{job_id}.mp4"
@@ -814,6 +821,8 @@ def background_render(job_id: str, video_path: str, words_data: list, style: str
             job.status = "failed"
             job.error_message = str(e)
             db.commit()
+    finally:
+        db.close()
 
 @app.post("/api/captions/v2/render")
 async def render_captions_v2(req: RenderRequestV2, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
@@ -822,13 +831,14 @@ async def render_captions_v2(req: RenderRequestV2, background_tasks: BackgroundT
     db.add(job)
     db.commit()
     
-    background_tasks.add_task(background_render, job_id, req.video_path, req.words_data, req.style, db)
+    background_tasks.add_task(background_render, job_id, req.video_path, req.words_data, req.style)
     return {"status": "success", "job_id": job_id}
 
 # ---------------------------------------------------------------------------
 # V3 Enterprise Pipeline Endpoints
 # ---------------------------------------------------------------------------
-def background_transcribe_v3(job_id: str, video_path: str, db: Session):
+def background_transcribe_v3(job_id: str, video_path: str):
+    db = SessionLocal()
     try:
         from core.orchestrator import PipelineManager
         from captions.transcriber import TranscriberEngine
@@ -864,6 +874,8 @@ def background_transcribe_v3(job_id: str, video_path: str, db: Session):
             job.status = "failed"
             job.error_message = str(e)
             db.commit()
+    finally:
+        db.close()
 
 @app.post("/api/captions/v3/transcribe")
 async def transcribe_captions_v3(background_tasks: BackgroundTasks, file: UploadFile = File(...), db: Session = Depends(get_db)):
@@ -877,7 +889,7 @@ async def transcribe_captions_v3(background_tasks: BackgroundTasks, file: Upload
     db.add(job)
     db.commit()
     
-    background_tasks.add_task(background_transcribe_v3, job_id, temp_vid, db)
+    background_tasks.add_task(background_transcribe_v3, job_id, temp_vid)
     return {"status": "success", "job_id": job_id, "video_path": temp_vid}
 
 @app.get("/api/captions/v3/status/{job_id}")
@@ -890,7 +902,8 @@ async def get_transcribe_status_v3(job_id: str, db: Session = Depends(get_db)):
 class RenderRequestV3(BaseModel):
     project_data: dict
 
-def background_render_v3(job_id: str, project_dict: dict, db: Session):
+def background_render_v3(job_id: str, project_dict: dict):
+    db = SessionLocal()
     try:
         import subprocess
         from models.core import Project
@@ -917,6 +930,10 @@ def background_render_v3(job_id: str, project_dict: dict, db: Session):
         ]
         subprocess.run(command, check=True)
         
+        # Cleanup the temporary .ass file to save space
+        try: os.remove(ass_path)
+        except: pass
+        
         job = db.query(RenderJob).filter(RenderJob.id == job_id).first()
         if job:
             job.status = "completed"
@@ -928,6 +945,8 @@ def background_render_v3(job_id: str, project_dict: dict, db: Session):
             job.status = "failed"
             job.error_message = str(e)
             db.commit()
+    finally:
+        db.close()
 
 @app.post("/api/captions/v3/render")
 async def render_captions_v3(req: RenderRequestV3, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
@@ -936,7 +955,7 @@ async def render_captions_v3(req: RenderRequestV3, background_tasks: BackgroundT
     db.add(job)
     db.commit()
     
-    background_tasks.add_task(background_render_v3, job_id, req.project_data, db)
+    background_tasks.add_task(background_render_v3, job_id, req.project_data)
     return {"status": "success", "job_id": job_id}
 
 @app.get("/api/captions/v3/render_status/{job_id}")
